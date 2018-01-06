@@ -6,7 +6,7 @@
 /*   By: nmei <nmei@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/21 13:55:08 by nmei              #+#    #+#             */
-/*   Updated: 2018/01/04 13:51:55 by nmei             ###   ########.fr       */
+/*   Updated: 2018/01/05 17:46:01 by nmei             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,22 +14,8 @@
 #include <ft_printf.h>
 #include <wchar.h>
 
-void			handle_wchar(t_vfpf *p)
-{
-	int		pf;
-	wint_t	wc;
-
-	pf = p->flags;
-	wc = (wchar_t)va_arg(p->args, wint_t);
-	if (pf & WIDTH_OB_FLAG && !(pf & DASH_FLAG))
-		pad_width(p, 1);
-	pf_putwchar(p, wc);
-	if (pf & WIDTH_OB_FLAG && (pf & DASH_FLAG))
-		pad_width(p, 1);
-}
-
 /*
-**	Intentionally crippled version!
+**	Working version
 **
 **void			handle_wchar(t_vfpf *p)
 **{
@@ -37,14 +23,32 @@ void			handle_wchar(t_vfpf *p)
 **	wint_t	wc;
 **
 **	pf = p->flags;
-**	wc = (char)va_arg(p->args, wint_t);
+**	wc = (wchar_t)va_arg(p->args, wint_t);
 **	if (pf & WIDTH_OB_FLAG && !(pf & DASH_FLAG))
 **		pad_width(p, 1);
-**	p->len += write(p->fd, &wc, 1);
+**	pf_putwchar(p, wc);
 **	if (pf & WIDTH_OB_FLAG && (pf & DASH_FLAG))
 **		pad_width(p, 1);
 **}
 */
+
+/*
+**	Intentionally crippled version!
+*/
+
+void			handle_wchar(t_vfpf *p)
+{
+	int		pf;
+	wint_t	wc;
+
+	pf = p->flags;
+	wc = (char)va_arg(p->args, wint_t);
+	if (pf & WIDTH_OB_FLAG && !(pf & DASH_FLAG))
+		pad_width(p, 1);
+	buff(p, &wc, 1);
+	if (pf & WIDTH_OB_FLAG && (pf & DASH_FLAG))
+		pad_width(p, 1);
+}
 
 /*
 **	handle_char()
@@ -101,7 +105,7 @@ void			handle_char(t_vfpf *p)
 **	   wide char.
 */
 
-static size_t	calc_precision(wchar_t *str, int precision, size_t new_prec)
+size_t			calc_precision(wchar_t *str, int precision, size_t new_prec)
 {
 	if (*str == '\0' || precision == 0)
 		return (new_prec);
@@ -117,50 +121,54 @@ static size_t	calc_precision(wchar_t *str, int precision, size_t new_prec)
 		return (new_prec);
 }
 
-void			handle_wstr(t_vfpf *p)
-{
-	int		pf;
-	wchar_t	*wstr;
-	int		wslen;
-
-	pf = p->flags;
-	if ((wstr = va_arg(p->args, wchar_t *)) == NULL)
-		wstr = L"(null)";
-	wslen = (int)pf_wstrlen(wstr);
-	p->precision = (int)calc_precision(wstr, p->precision, 0);
-	if (p->precision < 0)
-		p->precision = wslen;
-	p->precision = (p->precision > wslen) ? wslen : p->precision;
-	wslen = (pf & PRECI_OB_FLAG) ? p->precision : wslen;
-	if (pf & WIDTH_OB_FLAG && !(pf & DASH_FLAG))
-		pad_width(p, wslen);
-	pf_putwstr(p, wstr, wslen);
-	if (pf & WIDTH_OB_FLAG && (pf & DASH_FLAG))
-		pad_width(p, wslen);
-}
+/*
+**	Working version!
+**
+**void			handle_wstr(t_vfpf *p)
+**{
+**	int		pf;
+**	wchar_t	*wstr;
+**	int		wslen;
+**
+**	pf = p->flags;
+**	if ((wstr = va_arg(p->args, wchar_t *)) == NULL)
+**		wstr = L"(null)";
+**	wslen = (int)pf_wstrlen(wstr);
+**	p->precision = (int)calc_precision(wstr, p->precision, 0);
+**	if (p->precision < 0)
+**		p->precision = wslen;
+**	p->precision = (p->precision > wslen) ? wslen : p->precision;
+**	wslen = (pf & PRECI_OB_FLAG) ? p->precision : wslen;
+**	if (pf & WIDTH_OB_FLAG && !(pf & DASH_FLAG))
+**		pad_width(p, wslen);
+**	pf_putwstr(p, wstr, wslen);
+**	if (pf & WIDTH_OB_FLAG && (pf & DASH_FLAG))
+**		pad_width(p, wslen);
+**}
+*/
 
 /*
 **	Intentionally crippled version!
-**
-**void		handle_wstr(t_vfpf *p)
-**{
-**	int		pf;
-**	char	*str;
-**	int		slen;
-**
-**	pf = p->flags;
-**	if ((str = (char *)va_arg(p->args, wchar_t *)) == NULL)
-**		str = "(null)";
-**	slen = (int)ft_strlen(str);
-**	p->precision = (p->precision > slen) ? slen : p->precision;
-**	slen = (pf & PRECI_OB_FLAG) ? p->precision : slen;
-**	if (pf & WIDTH_OB_FLAG && !(pf & DASH_FLAG))
-**		pad_width(p, slen);
-**	p->len += write(p->fd, str, slen);
-**	if (pf & WIDTH_OB_FLAG && (pf & DASH_FLAG))
-**		pad_width(p, slen);
-**}
 */
+
+void			handle_wstr(t_vfpf *p)
+{
+	int		pf;
+	char	*str;
+	int		slen;
+
+	pf = p->flags;
+	if ((str = (char *)va_arg(p->args, wchar_t *)) == NULL)
+		str = "(null)";
+	slen = (int)ft_strlen(str);
+	p->precision = (p->precision > slen) ? slen : p->precision;
+	slen = (pf & PRECI_OB_FLAG) ? p->precision : slen;
+	if (pf & WIDTH_OB_FLAG && !(pf & DASH_FLAG))
+		pad_width(p, slen);
+	buff(p, str, slen);
+	if (pf & WIDTH_OB_FLAG && (pf & DASH_FLAG))
+		pad_width(p, slen);
+}
 
 /*
 **	handle_str()
