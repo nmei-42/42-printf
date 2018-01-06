@@ -1,5 +1,5 @@
 # 42-ft_printf
-A naive implementation of <stdio.h> printf() function as part of the 42 curriculum.
+A naive implementation of the <stdio.h> printf() function as part of the 42 curriculum.
 
 ### Compiling the ft_printf static library
 To use this ft_printf function, either download the zip or `git clone` the repository and run `make` in the root of the project directory. This will generate a static library that you can include in your program.
