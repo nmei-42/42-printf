@@ -14,7 +14,7 @@ When compiling make sure to link the `libftprintf.a` library. An example:
 Then just run your program!
 
 ### Useful resources
-Here are some resources that I personally found very useful for this project!
+Here are some resources that I personally found very useful for this project! Good luck if you're also tackling it!
 
 http://www.cplusplus.com/reference/cstdio/printf/
 
