@@ -6,7 +6,7 @@
 /*   By: nmei <nmei@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/21 13:55:08 by nmei              #+#    #+#             */
-/*   Updated: 2018/01/05 17:46:01 by nmei             ###   ########.fr       */
+/*   Updated: 2018/01/05 18:10:17 by nmei             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -154,18 +154,22 @@ size_t			calc_precision(wchar_t *str, int precision, size_t new_prec)
 void			handle_wstr(t_vfpf *p)
 {
 	int		pf;
+	wchar_t	*wstr;
 	char	*str;
 	int		slen;
 
 	pf = p->flags;
-	if ((str = (char *)va_arg(p->args, wchar_t *)) == NULL)
-		str = "(null)";
-	slen = (int)ft_strlen(str);
+	if ((wstr = va_arg(p->args, wchar_t *)) == NULL)
+		wstr = L"(null)";
+	slen = (int)pf_wstrlen(wstr);
+	if (p->precision < 0)
+		p->precision = slen;
 	p->precision = (p->precision > slen) ? slen : p->precision;
 	slen = (pf & PRECI_OB_FLAG) ? p->precision : slen;
 	if (pf & WIDTH_OB_FLAG && !(pf & DASH_FLAG))
 		pad_width(p, slen);
-	buff(p, str, slen);
+	str = (char *)wstr;
+	pf_putwstr(p, wstr, slen);
 	if (pf & WIDTH_OB_FLAG && (pf & DASH_FLAG))
 		pad_width(p, slen);
 }
@@ -196,9 +200,9 @@ void			handle_str(t_vfpf *p)
 		if ((str = va_arg(p->args, char *)) == NULL)
 			str = "(null)";
 		slen = (int)ft_strlen(str);
-		p->precision = (p->precision > slen) ? slen : p->precision;
 		if (p->precision < 0)
 			p->precision = slen;
+		p->precision = (p->precision > slen) ? slen : p->precision;
 		slen = (pf & PRECI_OB_FLAG) ? p->precision : slen;
 		if (pf & WIDTH_OB_FLAG && !(pf & DASH_FLAG))
 			pad_width(p, slen);
