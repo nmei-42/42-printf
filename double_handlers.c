@@ -6,7 +6,7 @@
 /*   By: nmei <nmei@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/21 13:56:58 by nmei              #+#    #+#             */
-/*   Updated: 2018/01/05 16:27:50 by nmei             ###   ########.fr       */
+/*   Updated: 2018/01/05 17:21:14 by nmei             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,8 @@ long double			get_ld_arg(t_vfpf *p, size_t *len, int base)
 	else
 		nbr = (long double)va_arg(p->args, double);
 	tmp = (uintmax_t)DABS(nbr);
+	if (tmp == 0)
+		*len += 1;
 	while (tmp && ++(*len))
 		tmp /= base;
 	return (nbr);
