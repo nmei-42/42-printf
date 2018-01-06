@@ -6,7 +6,7 @@
 /*   By: nmei <nmei@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/12/21 13:55:08 by nmei              #+#    #+#             */
-/*   Updated: 2018/01/05 18:10:17 by nmei             ###   ########.fr       */
+/*   Updated: 2018/01/05 19:49:04 by nmei             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,24 +16,6 @@
 
 /*
 **	Working version
-**
-**void			handle_wchar(t_vfpf *p)
-**{
-**	int		pf;
-**	wint_t	wc;
-**
-**	pf = p->flags;
-**	wc = (wchar_t)va_arg(p->args, wint_t);
-**	if (pf & WIDTH_OB_FLAG && !(pf & DASH_FLAG))
-**		pad_width(p, 1);
-**	pf_putwchar(p, wc);
-**	if (pf & WIDTH_OB_FLAG && (pf & DASH_FLAG))
-**		pad_width(p, 1);
-**}
-*/
-
-/*
-**	Intentionally crippled version!
 */
 
 void			handle_wchar(t_vfpf *p)
@@ -42,13 +24,32 @@ void			handle_wchar(t_vfpf *p)
 	wint_t	wc;
 
 	pf = p->flags;
-	wc = (char)va_arg(p->args, wint_t);
+	wc = (wchar_t)va_arg(p->args, wint_t);
 	if (pf & WIDTH_OB_FLAG && !(pf & DASH_FLAG))
 		pad_width(p, 1);
-	buff(p, &wc, 1);
+	pf_putwchar(p, wc);
 	if (pf & WIDTH_OB_FLAG && (pf & DASH_FLAG))
 		pad_width(p, 1);
 }
+
+/*
+**	Intentionally crippled version!
+**
+**
+**void			handle_wchar(t_vfpf *p)
+**{
+**	int		pf;
+**	wint_t	wc;
+**
+**	pf = p->flags;
+**	wc = (char)va_arg(p->args, wint_t);
+**	if (pf & WIDTH_OB_FLAG && !(pf & DASH_FLAG))
+**		pad_width(p, 1);
+**	buff(p, &wc, 1);
+**	if (pf & WIDTH_OB_FLAG && (pf & DASH_FLAG))
+**		pad_width(p, 1);
+**}
+*/
 
 /*
 **	handle_char()
@@ -123,56 +124,56 @@ size_t			calc_precision(wchar_t *str, int precision, size_t new_prec)
 
 /*
 **	Working version!
-**
-**void			handle_wstr(t_vfpf *p)
-**{
-**	int		pf;
-**	wchar_t	*wstr;
-**	int		wslen;
-**
-**	pf = p->flags;
-**	if ((wstr = va_arg(p->args, wchar_t *)) == NULL)
-**		wstr = L"(null)";
-**	wslen = (int)pf_wstrlen(wstr);
-**	p->precision = (int)calc_precision(wstr, p->precision, 0);
-**	if (p->precision < 0)
-**		p->precision = wslen;
-**	p->precision = (p->precision > wslen) ? wslen : p->precision;
-**	wslen = (pf & PRECI_OB_FLAG) ? p->precision : wslen;
-**	if (pf & WIDTH_OB_FLAG && !(pf & DASH_FLAG))
-**		pad_width(p, wslen);
-**	pf_putwstr(p, wstr, wslen);
-**	if (pf & WIDTH_OB_FLAG && (pf & DASH_FLAG))
-**		pad_width(p, wslen);
-**}
-*/
-
-/*
-**	Intentionally crippled version!
 */
 
 void			handle_wstr(t_vfpf *p)
 {
 	int		pf;
 	wchar_t	*wstr;
-	char	*str;
-	int		slen;
+	int		wslen;
 
 	pf = p->flags;
 	if ((wstr = va_arg(p->args, wchar_t *)) == NULL)
 		wstr = L"(null)";
-	slen = (int)pf_wstrlen(wstr);
+	wslen = (int)pf_wstrlen(wstr);
+	p->precision = (int)calc_precision(wstr, p->precision, 0);
 	if (p->precision < 0)
-		p->precision = slen;
-	p->precision = (p->precision > slen) ? slen : p->precision;
-	slen = (pf & PRECI_OB_FLAG) ? p->precision : slen;
+		p->precision = wslen;
+	p->precision = (p->precision > wslen) ? wslen : p->precision;
+	wslen = (pf & PRECI_OB_FLAG) ? p->precision : wslen;
 	if (pf & WIDTH_OB_FLAG && !(pf & DASH_FLAG))
-		pad_width(p, slen);
-	str = (char *)wstr;
-	pf_putwstr(p, wstr, slen);
+		pad_width(p, wslen);
+	pf_putwstr(p, wstr, wslen);
 	if (pf & WIDTH_OB_FLAG && (pf & DASH_FLAG))
-		pad_width(p, slen);
+		pad_width(p, wslen);
 }
+
+/*
+**	Intentionally crippled version!
+**
+**void			handle_wstr(t_vfpf *p)
+**{
+**	int		pf;
+**	wchar_t	*wstr;
+**	char	*str;
+**	int		slen;
+**
+**	pf = p->flags;
+**	if ((wstr = va_arg(p->args, wchar_t *)) == NULL)
+**		wstr = L"(null)";
+**	slen = (int)pf_wstrlen(wstr);
+**	if (p->precision < 0)
+**		p->precision = slen;
+**	p->precision = (p->precision > slen) ? slen : p->precision;
+**	slen = (pf & PRECI_OB_FLAG) ? p->precision : slen;
+**	if (pf & WIDTH_OB_FLAG && !(pf & DASH_FLAG))
+**		pad_width(p, slen);
+**	str = (char *)wstr;
+**	pf_putwstr(p, wstr, slen);
+**	if (pf & WIDTH_OB_FLAG && (pf & DASH_FLAG))
+**		pad_width(p, slen);
+**}
+*/
 
 /*
 **	handle_str()
