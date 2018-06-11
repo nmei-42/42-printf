@@ -1,4 +1,4 @@
-# 42-ft_printf
+# ft_printf
 A naive implementation of the <stdio.h> printf() function as part of the 42 curriculum.
 
 ### Compiling the ft_printf static library
